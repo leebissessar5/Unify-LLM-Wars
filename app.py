@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from unify import ChatBot
 
@@ -10,7 +11,12 @@ if 'chatbot2' not in st.session_state:
 def input_fields():
     with st.sidebar:
         st.header("Configuration")
-        unify_api_key = st.text_input("Unify API Key*", type="password", placeholder="Enter Unify API Key")
+
+        if 'unify_api_key' in st.secrets:
+            unify_api_key = st.secrets['unify_api_key']
+        else:
+            unify_api_key = st.text_input("Unify API Key*", type="password", placeholder="Enter Unify API Key")
+
         endpoint1 = st.text_input("Endpoint 1*", placeholder="model@provider", value="claude-3-haiku@anthropic")
         endpoint2 = st.text_input("Endpoint 2*", placeholder="model@provider", value="mixtral-8x7b-instruct-v0.1@together-ai")
         show_credits = st.toggle("Show Credit Usage", value=False)
@@ -72,7 +78,7 @@ def main():
             st.sidebar.write(f"Credit Balance: ${st.session_state.chatbot1._get_credits():.2g}")
 
     if user_input := st.chat_input("Type your message here..."):
-        if st.session_state.chatbot1 and st.session_state.chatbot2:
+        if chatbots_exists():
             placeholder.empty()
             chat_interface(user_input, st.session_state.chatbot1, st.session_state.chatbot2)
         else:
