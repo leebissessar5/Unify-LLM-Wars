@@ -1,6 +1,11 @@
 import streamlit as st
 from unify import ChatBot
 
+if 'chatbot1' not in st.session_state:
+    st.session_state['chatbot1'] = None
+if 'chatbot2' not in st.session_state:
+    st.session_state['chatbot2'] = None
+
 # Function to input API keys and endpoints
 def input_fields():
     with st.sidebar:
@@ -35,33 +40,41 @@ def chat_interface(prompt, chatbot1, chatbot2):
     with dual_chat[1].chat_message("AI 2", avatar='🤖'):
         st.write_stream(chatbot2._process_input(prompt, show_credits=False, show_provider=False))
 
+def chatbots_exists():
+    return st.session_state.chatbot1 and st.session_state.chatbot2
+
+def chatbots_empty():
+    return not st.session_state.chatbot1._message_history or not st.session_state.chatbot2._message_history
+
 def main():
     st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars")
 
     placeholder = st.empty()
-    placeholder.write('''
-        Usage: 
-        1. Input your **Unify API Key.** If you don’t have one yet, log in to the [console](https://console.unify.ai/) to get yours.
-        2. Input your Endpoints (i.e. **Model and Provider ID** as model@provider). You can find both in the [benchmark interface](https://unify.ai/hub).
-        3. Chat Away!
-    ''')
-
-    chatbot1, chatbot2 = None, None
+    if not chatbots_exists() or (chatbots_exists() and chatbots_empty()):
+        placeholder.write('''
+            Usage: 
+            1. Input your **Unify API Key.** If you don’t have one yet, log in to the [console](https://console.unify.ai/) to get yours.
+            2. Input your Endpoints (i.e. **Model and Provider ID** as model@provider). You can find both in the [benchmark interface](https://unify.ai/hub).
+            3. Chat Away!
+        ''')
 
     unify_api_key, endpoint1, endpoint2, show_credits = input_fields()
-    ready = unify_api_key and endpoint1 and endpoint2
 
-    if ready:
-        chatbot1 = ChatBot(unify_api_key, endpoint1)
-        chatbot2 = ChatBot(unify_api_key, endpoint2)
+    if unify_api_key and endpoint1 and endpoint2:
+        # If the endpoint changes, update the ChatBot instance
+        if not st.session_state.chatbot1 or st.session_state.chatbot1.endpoint != endpoint1:
+            st.session_state.chatbot1 = ChatBot(unify_api_key, endpoint1)
+        if not st.session_state.chatbot2 or st.session_state.chatbot2.endpoint != endpoint2:
+            st.session_state.chatbot2 = ChatBot(unify_api_key, endpoint2)
+
         if show_credits:
-            st.sidebar.write(f"Credit Balance: ${chatbot1._get_credits():.2g}")
+            st.sidebar.write(f"Credit Balance: ${st.session_state.chatbot1._get_credits():.2g}")
 
     if user_input := st.chat_input("Type your message here..."):
-        if unify_api_key and endpoint1 and endpoint2:
+        if st.session_state.chatbot1 and st.session_state.chatbot2:
             placeholder.empty()
-            chat_interface(user_input, chatbot1, chatbot2)
+            chat_interface(user_input, st.session_state.chatbot1, st.session_state.chatbot2)
         else:
             st.sidebar.warning("Please enter the Unify API Key and Endpoints to proceed.")
 
