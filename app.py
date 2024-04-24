@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from unify import ChatBot
 
