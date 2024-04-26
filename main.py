@@ -6,8 +6,7 @@ from battle import llm_battle
 def main():
     st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars &#x2694;")
-    selected_models = []
-    api_key, endpoints, show_credits = input_fields(selected_models)
+    api_key, endpoints, show_credits = input_fields()
 
     if api_key and endpoints and all(endpoints.values()):
         chatbot1 = ChatBot(api_key, endpoints['LLM1'])
