@@ -4,6 +4,7 @@ from config import input_fields
 from battle import llm_battle
 
 def main():
+    st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars &#x2694;")
     selected_models = []
     api_key, endpoints, show_credits = input_fields(selected_models)

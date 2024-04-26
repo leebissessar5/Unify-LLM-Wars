@@ -9,7 +9,13 @@ with open('models.json', 'r') as f:
 def input_fields(selected_models):
     with st.sidebar:
         st.header("Configuration")
-        api_key = st.text_input("API Key*", type="password")
+
+        # Show text field if API key is not stored in secrets
+        if 'unify_api_key' in st.secrets:
+            api_key = st.secrets['unify_api_key']
+        else:
+            api_key = st.text_input("Unify API Key*", type="password", placeholder="Enter Unify API Key")
+    
         show_credits = st.checkbox("Show Credit Usage", value=False)
 
         model_names = [model['name'] for model in models if model['name'] not in selected_models]
