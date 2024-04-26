@@ -7,8 +7,6 @@ def llm_battle(chatbot1, chatbot2, judge, show_credits):
     chatbots = (chatbot1, chatbot2) if round_number % 2 == 1 else (chatbot2, chatbot1)
     first_player, second_player = ('LLM 1', 'LLM 2') if round_number % 2 == 1 else ('LLM 2', 'LLM 1')
 
-    with st.chat_message("User", avatar='🧑‍💻'):
-        st.markdown(prompt)
     st.markdown(f"*Round {round_number}*, First player's turn: {'LLM 1' if round_number % 2 == 1 else 'LLM 2'}")
 
     with st.chat_message("1"):
