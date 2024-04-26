@@ -1,0 +1,170 @@
+{
+  "models": [
+    {
+      "name": "mixtral-8x7b-instruct-v0.1",
+      "providers": [
+        "together-ai",
+        "octoai",
+        "replicate",
+        "mistral-ai",
+        "perplexity-ai",
+        "anyscale",
+        "fireworks-ai",
+        "lepton-ai",
+        "deepinfra",
+        "aws-bedrock"
+      ]
+    },
+    {
+      "name": "mistral-7b-instruct-v0.2",
+      "providers": [
+        "perplexity-ai",
+        "together-ai",
+        "mistral-ai",
+        "replicate",
+        "aws-bedrock",
+        "octoai",
+        "fireworks-ai"
+      ]
+    },
+    {
+      "name": "gemma-7b-it",
+      "providers": [
+        "anyscale",
+        "together-ai",
+        "fireworks-ai",
+        "lepton-ai",
+        "deepinfra"
+      ]
+    },
+    {
+      "name": "codellama-13b-instruct",
+      "providers": ["together-ai", "octoai", "fireworks-ai"]
+    },
+    {
+      "name": "llama-3-8b-chat",
+      "providers": ["together-ai", "fireworks-ai"]
+    },
+    {
+      "name": "mistral-medium",
+      "providers": ["mistral-ai"]
+    },
+    {
+      "name": "gpt-3.5-turbo",
+      "providers": ["openai"]
+    },
+    {
+      "name": "gpt-4-turbo",
+      "providers": ["openai"]
+    },
+    {
+      "name": "claude-3-haiku",
+      "providers": ["anthropic"]
+    },
+    {
+      "name": "llama-2-70b-chat",
+      "providers": [
+        "anyscale",
+        "perplexity-ai",
+        "together-ai",
+        "replicate",
+        "octoai",
+        "fireworks-ai",
+        "lepton-ai",
+        "deepinfra",
+        "aws-bedrock"
+      ]
+    },
+    {
+      "name": "llama-2-7b-chat",
+      "providers": [
+        "anyscale",
+        "together-ai",
+        "replicate",
+        "fireworks-ai",
+        "lepton-ai",
+        "deepinfra"
+      ]
+    },
+    {
+      "name": "mistral-7b-instruct-v0.1",
+      "providers": ["anyscale", "together-ai", "fireworks-ai", "deepinfra"]
+    },
+    {
+      "name": "codellama-7b-instruct",
+      "providers": ["together-ai", "octoai"]
+    },
+    {
+      "name": "llama-3-70b-chat",
+      "providers": ["together-ai", "fireworks-ai"]
+    },
+    {
+      "name": "gpt-4",
+      "providers": ["openai"]
+    },
+    {
+      "name": "deepseek-coder-33b-instruct",
+      "providers": ["together-ai"]
+    },
+    {
+      "name": "mistral-small",
+      "providers": ["mistral-ai"]
+    },
+    {
+      "name": "claude-3-opus",
+      "providers": ["anthropic"]
+    },
+    {
+      "name": "llama-2-13b-chat",
+      "providers": [
+        "anyscale",
+        "together-ai",
+        "replicate",
+        "octoai",
+        "fireworks-ai",
+        "lepton-ai",
+        "deepinfra",
+        "aws-bedrock"
+      ]
+    },
+    {
+      "name": "codellama-34b-instruct",
+      "providers": [
+        "anyscale",
+        "perplexity-ai",
+        "together-ai",
+        "octoai",
+        "fireworks-ai",
+        "deepinfra"
+      ]
+    },
+    {
+      "name": "mixtral-8x22b-instruct-v0.1",
+      "providers": ["mistral-ai", "together-ai", "fireworks-ai", "deepinfra"]
+    },
+    {
+      "name": "yi-34b-chat",
+      "providers": ["together-ai", "deepinfra"]
+    },
+    {
+      "name": "pplx-7b-chat",
+      "providers": ["perplexity-ai"]
+    },
+    {
+      "name": "ppix-70b-chat",
+      "providers": ["perplexity-ai"]
+    },
+    {
+      "name": "gemma-2b-it",
+      "providers": ["together-ai"]
+    },
+    {
+      "name": "mistral-large",
+      "providers": ["mistral-ai"]
+    },
+    {
+      "name": "claude-3-sonnet",
+      "providers": ["anthropic"]
+    }
+  ]
+}

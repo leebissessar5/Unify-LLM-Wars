@@ -63,7 +63,7 @@ def llm_battle(chatbot1, chatbot2, judge):
         prompt = "Generate another random question."
 
 def main():
-    st.title("LLM Wars")
+    st.title("LLM Wars &#9876;")
     api_key, endpoint1, endpoint2, judge_endpoint = input_fields()
 
     if api_key and endpoint1 and endpoint2 and judge_endpoint:
