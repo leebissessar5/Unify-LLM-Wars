@@ -15,8 +15,7 @@ def input_fields():
             api_key = st.secrets['unify_api_key']
         else:
             api_key = st.text_input("Unify API Key*", type="password", placeholder="Enter Unify API Key")
-    
-        show_credits = st.checkbox("Show Credit Usage", value=False)
+
 
         model_names = [model['name'] for model in models]
         endpoints = {}
@@ -27,5 +26,7 @@ def input_fields():
                 providers = [model['providers'] for model in models if model['name'] == selected_model][0]
                 selected_provider = st.selectbox(f"{key} Provider", options=providers, key=f"{key}_provider")
                 endpoints[key] = f"{selected_model}@{selected_provider}"
+
+        show_credits = st.toggle("Show Credit Usage", value=False)
 
         return api_key, endpoints, show_credits
