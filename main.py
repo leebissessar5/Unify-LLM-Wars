@@ -3,13 +3,16 @@ from unify import ChatBot
 from battle import llm_battle
 from config import input_fields
 
-for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done']:
+for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done', 'Next Round']:
     if key not in st.session_state:
         st.session_state[key] = None
 
 def new_chat_cb():
     st.session_state['New Chat'] = True
     st.session_state['Done'] = True
+
+def next_round_cb(yes):
+    st.session_state['Next Round'] = yes
 
 def chatbots_exists():
     return st.session_state['LLM1'] and st.session_state['LLM2'] and st.session_state['Judge']
@@ -23,10 +26,13 @@ def main():
     st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars &#x2694;")
 
-    api_key, endpoints, show_credits = input_fields()
+    api_key, endpoints = input_fields()
 
     if 'new_chat_cb' not in st.session_state:
         st.session_state['new_chat_cb'] = new_chat_cb
+
+    if 'next_round_cb' not in st.session_state:
+        st.session_state['next_round_cb'] = next_round_cb
 
     # verify that all required fields are filled in
     if api_key and endpoints and all(endpoints.values()):
@@ -54,11 +60,14 @@ def main():
                 placeholder.empty()
                 btn_placeholder.empty()
                 st.session_state['New Chat'] = False
-                llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits, new_chat=True)
+                llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], new_chat=True)
             else:
                 st.warning("Please enter the Unify API Key on the sidebar to proceed.")
     else:
-        llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits, new_chat=False)
+        llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], new_chat=False, next_round=st.session_state['Next Round'])
+
+    if chatbots_exists() and st.sidebar.checkbox("Show Credit Balance"):
+        st.sidebar.write(f"Credit Balance: ${st.session_state['LLM1']._get_credits():.2f}")
 
     if st.session_state['Done']:
         st.session_state['Done'] = False

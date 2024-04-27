@@ -27,6 +27,4 @@ def input_fields():
                 selected_provider = st.selectbox(f"{key} Provider", options=providers, key=f"{key}_provider")
                 endpoints[key] = f"{selected_model}@{selected_provider}"
 
-        show_credits = st.toggle("Show Credit Usage", value=False)
-
-        return api_key, endpoints, show_credits
+        return api_key, endpoints
