@@ -1,9 +1,5 @@
 import streamlit as st
 
-round_number = 1
-prompt = "Generate a random question that you need to get answered, without giving an answer yourself."
-prev_content = []
-
 def clear_chats(*chatbots):
     for chatbot in chatbots:
         chatbot._message_history = []
