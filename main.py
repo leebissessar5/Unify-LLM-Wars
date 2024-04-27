@@ -54,9 +54,11 @@ def main():
                 placeholder.empty()
                 btn_placeholder.empty()
                 st.session_state['New Chat'] = False
-                llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits)
+                llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits, new_chat=True)
             else:
                 st.warning("Please enter the Unify API Key on the sidebar to proceed.")
+    else:
+        llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits, new_chat=False)
 
     if st.session_state['Done']:
         st.session_state['Done'] = False
