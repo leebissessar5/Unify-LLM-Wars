@@ -1,11 +1,15 @@
 import streamlit as st
 from unify import ChatBot
-from config import input_fields
 from battle import llm_battle
+from config import input_fields
 
-for key in ['LLM1', 'LLM2', 'Judge', 'New Chat']:
+for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done']:
     if key not in st.session_state:
         st.session_state[key] = None
+
+def new_chat_cb():
+    st.session_state['New Chat'] = True
+    st.session_state['Done'] = True
 
 def chatbots_exists():
     return st.session_state['LLM1'] and st.session_state['LLM2'] and st.session_state['Judge']
@@ -20,6 +24,9 @@ def main():
     st.title("LLM Wars &#x2694;")
 
     api_key, endpoints, show_credits = input_fields()
+
+    if 'new_chat_cb' not in st.session_state:
+        st.session_state['new_chat_cb'] = new_chat_cb
 
     # verify that all required fields are filled in
     if api_key and endpoints and all(endpoints.values()):
@@ -41,15 +48,20 @@ def main():
             3. Click **Start Battle**.
         ''')
 
-    # show the start button only if the chat is fresh
-    if st.session_state['New Chat'] and btn_placeholder.button("Start Battle"):
-        if chatbots_exists():
-            placeholder.empty()
-            btn_placeholder.empty()
-            st.session_state['New Chat'] = False
-            llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits)
-        else:
-            st.warning("Please enter the Unify API Key on the sidebar to proceed.")
+        # show the start button only if the chat is fresh
+        if btn_placeholder.button("Start Battle"):
+            if chatbots_exists():
+                placeholder.empty()
+                btn_placeholder.empty()
+                st.session_state['New Chat'] = False
+                llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], show_credits)
+            else:
+                st.warning("Please enter the Unify API Key on the sidebar to proceed.")
+
+    if st.session_state['Done']:
+        st.session_state['Done'] = False
+        st.rerun()
+
 
 if __name__ == "__main__":
     main()

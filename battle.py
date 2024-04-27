@@ -1,21 +1,27 @@
 import streamlit as st
 
+round_number = 1
+prompt = "Generate a random question that you need to get answered, without giving an answer yourself."
+
+def clear_chats(*chatbots):
+    for chatbot in chatbots:
+        chatbot._message_history = []
+
 def llm_battle(chatbot1, chatbot2, judge, show_credits):
-    prompt = "Generate a random question that you need to get answered, without giving an answer yourself."
-    round_number = 1
+    global round_number, prompt
 
     chatbots = (chatbot1, chatbot2) if round_number % 2 == 1 else (chatbot2, chatbot1)
     first_player, second_player = ('LLM 1', 'LLM 2') if round_number % 2 == 1 else ('LLM 2', 'LLM 1')
 
     st.markdown(f"*Round {round_number}*, First player's turn: {'LLM 1' if round_number % 2 == 1 else 'LLM 2'}")
 
-    with st.chat_message("1"):
+    with st.chat_message(first_player[-1]):
         player1_question = st.write_stream(chatbots[0]._process_input(prompt, show_credits=False, show_provider=False))
 
-    with st.chat_message("2"):
+    with st.chat_message(second_player[-1]):
         player2_answer = st.write_stream(chatbots[1]._process_input(player1_question, show_credits=False, show_provider=False))
     
-    with st.chat_message("1"):
+    with st.chat_message(first_player[-1]):
         player1_evaluation = st.write_stream(chatbots[0]._process_input(f"Evaluating {second_player}'s answer: {player2_answer}", show_credits=False, show_provider=False))
 
     with st.chat_message('Judge'):
@@ -37,8 +43,14 @@ def llm_battle(chatbot1, chatbot2, judge, show_credits):
     if show_credits:
         st.sidebar.write(f"Credit Balance: ${chatbot1._get_credits():.2f}")
 
-    # if st.button("Next Round", key=f"next{round_number}"):
-    #     pass
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Next Round", key=f"next{round_number}"):
+            round_number += 1
+            prompt = "Generate another random question that you need to get answered, without giving an answer yourself."
 
-    round_number += 1
-    prompt = "Generate another random question."
+    with col2:
+        if st.button("New Chat", key=f"new_chat", on_click=st.session_state['new_chat_cb']):
+            clear_chats(chatbot1, chatbot2, judge)
+            round_number = 1
+            prompt = "Generate a random question that you need to get answered, without giving an answer yourself."
