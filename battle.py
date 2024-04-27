@@ -1,6 +1,7 @@
 import streamlit as st
 
-refresh = True
+def update_credits():
+    st.session_state['credits'] = st.session_state['LLM1']._get_credits()
 
 def clear_chats(*chatbots):
     for chatbot in chatbots:
@@ -77,6 +78,8 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         else:
             st.info("It's a tie!")
             prev_content[-1]['Result'] = "It's a tie!"
+        
+        update_credits()
 
     col1, col2 = st.columns(2)
     with col1:

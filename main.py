@@ -42,6 +42,10 @@ def main():
                 st.session_state[keys] = ChatBot(api_key, endpoints[keys])
                 # Reset the chat if any of the ChatBots have been created
                 st.session_state['New Chat'] = True
+                
+        if 'credits' not in st.session_state:
+            st.session_state['credits'] = st.session_state['LLM1']._get_credits()
+
 
     # create empty placeholders for the instructions and start button
     placeholder, btn_placeholder = st.empty(), st.empty()
@@ -66,8 +70,8 @@ def main():
     else:
         llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], new_chat=False, next_round=st.session_state['Next Round'])
 
-    if chatbots_exists() and st.sidebar.checkbox("Show Credit Balance"):
-        st.sidebar.write(f"Credit Balance: ${st.session_state['LLM1']._get_credits():.2f}")
+    if chatbots_exists() and st.sidebar.toggle("Show Credit Balance"):
+        st.sidebar.write(f"Credit Balance: ${st.session_state['credits']:.2f}")
 
     if st.session_state['Done']:
         st.session_state['Done'] = False
