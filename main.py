@@ -3,11 +3,13 @@ from unify import ChatBot
 from battle import llm_battle
 from config import input_fields
 
-for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done', 'Next Round']:
+for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done', 'Next Round', 'Valid Key']:
     if key not in st.session_state:
         st.session_state[key] = None
         if key == 'New Chat':
             st.session_state[key] = True
+        if key == 'Valid Key':
+            st.session_state[key] = False
 
 def new_chat_cb():
     st.session_state['New Chat'] = True
@@ -54,8 +56,13 @@ def main():
                 # Reset the chat if any of the ChatBots have been created
                 st.session_state['New Chat'] = True
                 
-        if 'credits' not in st.session_state:
-            st.session_state['credits'] = st.session_state['LLM1']._get_credits()
+        try:
+            if 'credits' not in st.session_state:
+                st.session_state['credits'] = st.session_state['LLM1']._get_credits()
+                st.session_state['Valid Key'] = True
+        except:
+            st.error("Error fetching credit balance. Please check your Unify API Key.")
+            st.session_state['Valid Key'] = False
 
 
     # create empty placeholders for the instructions and start button
@@ -71,7 +78,7 @@ def main():
 
         # show the start button only if the chat is fresh
         if btn_placeholder.button("Start Battle"):
-            if chatbots_exists():
+            if chatbots_exists() and st.session_state['Valid Key']:
                 placeholder.empty()
                 btn_placeholder.empty()
                 st.session_state['New Chat'] = False
