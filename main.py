@@ -6,7 +6,7 @@ from config import input_fields
 for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done', 'Next Round']:
     if key not in st.session_state:
         st.session_state[key] = None
-        if key is 'New Chat':
+        if key == 'New Chat':
             st.session_state[key] = True
 
 def new_chat_cb():
@@ -81,7 +81,7 @@ def main():
     else:
         llm_battle(st.session_state['LLM1'], st.session_state['LLM2'], st.session_state['Judge'], new_chat=False, next_round=st.session_state['Next Round'])
 
-    if chatbots_exists() and st.sidebar.toggle("Show Credit Balance"):
+    if chatbots_exists() and 'credits' in st.session_state and st.sidebar.toggle("Show Credit Balance"):
         st.sidebar.write(f"Credit Balance: ${st.session_state['credits']:.2f}")
 
     if st.session_state['Done']:
