@@ -37,6 +37,12 @@ def main():
     if 'prev_content' not in st.session_state:
         st.session_state['prev_content'] = []
 
+    if 'round_number' not in st.session_state:
+        st.session_state['round_number'] = 1
+
+    if 'prompt' not in st.session_state:
+        st.session_state['prompt'] = ''
+
     # verify that all required fields are filled in
     if api_key and endpoints and all(endpoints.values()):
         # create ChatBot instances if they don't exist yet

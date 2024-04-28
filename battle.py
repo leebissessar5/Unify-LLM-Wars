@@ -8,16 +8,14 @@ def clear_chats(*chatbots):
         chatbot._message_history = []
 
 def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
-    global round_number, prompt
-
     if new_chat:
         clear_chats(chatbot1, chatbot2, judge)
-        round_number = 1
-        prompt = "Generate a random question that you need to get answered, without giving an answer yourself."
+        st.session_state['round_number'] = 1
+        st.session_state['prompt'] = "Generate a random question that you need to get answered, without giving an answer yourself."
         st.session_state['prev_content'] = []
     else:
-        if next_round: round_number += 1
-        prompt = "Generate another random question that you need to get answered, without giving an answer yourself."
+        if next_round: st.session_state['round_number'] += 1
+        st.session_state['prompt'] = "Generate another random question that you need to get answered, without giving an answer yourself."
 
     for content in st.session_state['prev_content']:
         st.markdown(content['Info'])
@@ -33,14 +31,14 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
 
     if next_round:
         st.session_state['next_round_cb'](False) 
-        chatbots = (chatbot1, chatbot2) if round_number % 2 == 1 else (chatbot2, chatbot1)
-        first_player, second_player = ('LLM 1', 'LLM 2') if round_number % 2 == 1 else ('LLM 2', 'LLM 1')
+        chatbots = (chatbot1, chatbot2) if st.session_state['round_number'] % 2 == 1 else (chatbot2, chatbot1)
+        first_player, second_player = ('LLM 1', 'LLM 2') if st.session_state['round_number'] % 2 == 1 else ('LLM 2', 'LLM 1')
 
-        round_info = f"*Round {round_number}*, First player's turn: {'LLM 1' if round_number % 2 == 1 else 'LLM 2'}"
+        round_info = f"*Round {st.session_state['round_number']}*, First player's turn: {'LLM 1' if st.session_state['round_number'] % 2 == 1 else 'LLM 2'}"
         st.markdown(round_info)
 
         with st.chat_message(first_player[-1]):
-            player1_question = st.write_stream(chatbots[0]._process_input(prompt, show_credits=False, show_provider=False))
+            player1_question = st.write_stream(chatbots[0]._process_input(st.session_state['prompt'], show_credits=False, show_provider=False))
 
         with st.chat_message(second_player[-1]):
             player2_answer = st.write_stream(chatbots[1]._process_input(player1_question, show_credits=False, show_provider=False))
@@ -83,7 +81,7 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
 
     col1, col2 = st.columns(2)
     with col1:
-        st.button("Next Round", key=f"next{round_number}", on_click=lambda: st.session_state['next_round_cb'](True))
+        st.button("Next Round", key=f"next{st.session_state['round_number']}", on_click=lambda: st.session_state['next_round_cb'](True))
 
     with col2:
         st.button("New Chat", key=f"new_chat", on_click=st.session_state['new_chat_cb'])
