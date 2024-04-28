@@ -6,8 +6,8 @@ from config import input_fields
 for key in ['LLM1', 'LLM2', 'Judge', 'New Chat', 'Done', 'Next Round']:
     if key not in st.session_state:
         st.session_state[key] = None
-    if key is 'New Chat':
-        st.session_state[key] = True
+        if key is 'New Chat':
+            st.session_state[key] = True
 
 def new_chat_cb():
     st.session_state['New Chat'] = True
