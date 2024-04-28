@@ -8,18 +8,18 @@ def clear_chats(*chatbots):
         chatbot._message_history = []
 
 def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
-    global round_number, prompt, prev_content
+    global round_number, prompt
 
     if new_chat:
         clear_chats(chatbot1, chatbot2, judge)
         round_number = 1
         prompt = "Generate a random question that you need to get answered, without giving an answer yourself."
-        prev_content = []
+        st.session_state['prev_content'] = []
     else:
         if next_round: round_number += 1
         prompt = "Generate another random question that you need to get answered, without giving an answer yourself."
 
-    for content in prev_content:
+    for content in st.session_state['prev_content']:
         st.markdown(content['Info'])
         with st.chat_message(content['P1'][-1]):
             st.write(content['P1 Q'])
@@ -57,7 +57,7 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
                 show_credits=False, show_provider=False)
             )
 
-        prev_content.append(
+        st.session_state['prev_content'].append(
             {
                 'Info': round_info,
                 'P1': first_player,
@@ -71,13 +71,13 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
 
         if "Winner: LLM 1" in judge_evaluation:
             st.success("LLM 1 wins!")
-            prev_content[-1]['Result'] = 'LLM 1 wins!'
+            st.session_state['prev_content'][-1]['Result'] = 'LLM 1 wins!'
         elif "Winner: LLM 2" in judge_evaluation:
             st.success("LLM 2 wins!")
-            prev_content[-1]['Result'] = 'LLM 2 wins!'
+            st.session_state['prev_content'][-1]['Result'] = 'LLM 2 wins!'
         else:
             st.info("It's a tie!")
-            prev_content[-1]['Result'] = "It's a tie!"
+            st.session_state['prev_content'][-1]['Result'] = "It's a tie!"
         
         update_credits()
 
