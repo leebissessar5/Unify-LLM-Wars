@@ -21,16 +21,32 @@ for key in [
             st.session_state[key] = False
 
 
-def new_chat_cb():
+def new_chat_cb() -> None:
+    '''
+    Callback function for the "New Chat" button
+    '''
     st.session_state["New Chat"] = True
     st.session_state["Done"] = True
 
 
-def next_round_cb(yes):
+def next_round_cb(yes: bool) -> None:
+    '''
+    Callback function for the "Next Round" button
+
+    Args:
+        yes (bool): True if the user wants to start the next round,
+        False otherwise
+    '''
     st.session_state["Next Round"] = yes
 
 
-def chatbots_exists():
+def chatbots_exists() -> bool:
+    '''
+    Returns True if all chatbots are not None
+
+    Returns:
+        bool: True if all chatbots are not None
+    '''
     return (
         st.session_state["LLM1"]
         and st.session_state["LLM2"]
@@ -38,7 +54,13 @@ def chatbots_exists():
     )
 
 
-def chatbots_empty():
+def chatbots_empty() -> bool:
+    '''
+    Returns True if all chatbots have no messages in their message history
+
+    Returns:
+        bool: True if all chatbots have no messages in their message history
+    '''
     return chatbots_exists() and (
         not st.session_state["LLM1"]._message_history
         or not st.session_state["LLM2"]._message_history
@@ -47,6 +69,9 @@ def chatbots_empty():
 
 
 def main():
+    '''
+    Main function for the app
+    '''
     st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars &#x2694;")
 
@@ -101,8 +126,10 @@ def main():
         placeholder.write(
             """
             Usage:
-            1. Input your **Unify API Key** (if not stored as secrets, use the sidebar). If you don’t have one yet, log in to the [console](https://console.unify.ai/) to get yours.
-            2. Choose your Endpoints (i.e. **Model and Provider**, in the [benchmark interface](https://unify.ai/hub)).
+            1. Input your **Unify API Key**.  If you don’t have one yet,
+             log in to the [console](https://console.unify.ai/) to get yours.
+            2. Choose your Endpoints (i.e. **Model and Provider**,
+             in the [benchmark interface](https://unify.ai/hub)).
             3. Click **Start Battle**.
         """
         )
@@ -134,12 +161,6 @@ def main():
             new_chat=False,
             next_round=st.session_state["Next Round"],
         )
-
-    if chatbots_exists() and st.sidebar.toggle("Show Credit Balance"):
-        if "credits" in st.session_state:
-            st.sidebar.write(
-                f"Credit Balance: ${st.session_state['credits']:.2f}"
-            )
 
     if st.session_state["Done"]:
         st.session_state["Done"] = False

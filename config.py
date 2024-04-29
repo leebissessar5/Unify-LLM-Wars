@@ -6,10 +6,16 @@ from typing import List, Dict, Tuple
 
 base_url = "https://api.unify.ai/v0"
 
-if 'selections' not in st.session_state:
-    st.session_state['selections'] = {
-        'LLM1': {}, 'LLM2': {}, 'Judge': {}
-    }
+
+def init_session_state() -> None:
+    '''
+    Initialize session state if it doesn't exist yet
+    '''
+    if 'selections' not in st.session_state:
+        st.session_state['selections'] = {
+            'LLM1': {}, 'LLM2': {}, 'Judge': {}
+        }
+
 
 @st.cache_data
 def load_models() -> List[Dict[str, str]]:
@@ -150,6 +156,7 @@ def input_fields() -> Tuple[str, Dict[str, str]]:
     Returns:
         Tuple[str, Dict[str, str]]: API key, endpoints
     """
+    init_session_state()
     with st.sidebar:
         st.header("Configuration")
         api_key = st.text_input(
@@ -166,6 +173,14 @@ def input_fields() -> Tuple[str, Dict[str, str]]:
                 endpoint = select_model_provider(key, models)
                 if endpoint:
                     endpoints[key] = endpoint
+
+        if st.session_state["Valid Key"] and st.sidebar.toggle(
+         "Show Credit Balance", value=False, key='show_credit'
+        ):
+            if "credits" in st.session_state:
+                st.sidebar.write(
+                    f"Credit Balance: ${st.session_state['credits']:.2f}"
+                )
 
         if st.button("Update Models from API"):
             update_models()
