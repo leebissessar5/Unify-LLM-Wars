@@ -7,22 +7,9 @@ from typing import List, Dict, Tuple
 base_url = "https://api.unify.ai/v0"
 
 if 'selections' not in st.session_state:
-    st.session_state['selections'] = {}
-
-
-def update_selection(key: str, model_or_provider: str, value: str) -> None:
-    '''
-    Update the selection dictionary
-
-    Args:
-        key (str): The key to update
-        model_or_provider (str): The model or provider to update
-        value (str): The value to update
-    '''
-    if key not in st.session_state["selections"]:
-        st.session_state["selections"][key] = {}
-    st.session_state["selections"][key][model_or_provider] = value
-
+    st.session_state['selections'] = {
+        'LLM1': {}, 'LLM2': {}, 'Judge': {}
+    }
 
 @st.cache_data
 def load_models() -> List[Dict[str, str]]:
@@ -56,6 +43,22 @@ def get_providers(model: str) -> List[str]:
     else:
         st.error("Failed to fetch providers from API.")
         return []
+
+
+def get_summary_string(key: str) -> str:
+    """
+    Generate summary string for the expander based on current selections.
+
+    Args:
+        key (str): The key for LLM1, LLM2, or Judge
+
+    Returns:
+        str: A formatted summary string
+    """
+    selection = st.session_state["selections"][key]
+    if selection.get("name") and selection.get("provider"):
+        return f"{key}: {selection['name']}@{selection['provider']}"
+    return f"{key} Configuration"
 
 
 def update_models() -> None:
@@ -105,6 +108,41 @@ def list_models() -> List[str]:
         return []
 
 
+def select_model_provider(key: str, models: List[Dict[str, str]]) -> str:
+    """
+    Render model and provider selection boxes and update session state.
+
+    Args:
+        key (str): The key for LLM1, LLM2, or Judge
+        models (List[Dict[str, str]]): List of models and their providers
+
+    Returns:
+        str: The endpoint string constructed from selected model and provider
+    """
+    model_names = [model["name"] for model in models]
+    selected_model = st.selectbox(
+        "Model",
+        options=model_names,
+        key=f"{key}_model",
+    )
+    st.session_state["selections"][key]["name"] = selected_model
+
+    if selected_model:
+        model_details = next(
+            (item for item in models if item["name"] == selected_model), None
+        )
+        if model_details:
+            providers = model_details["providers"]
+            selected_provider = st.selectbox(
+                "Provider",
+                options=providers,
+                key=f"{key}_provider",
+            )
+            st.session_state["selections"][key]["provider"] = selected_provider
+            return f"{selected_model}@{selected_provider}"
+    return ""
+
+
 def input_fields() -> Tuple[str, Dict[str, str]]:
     """
     Input fields for the app
@@ -124,26 +162,10 @@ def input_fields() -> Tuple[str, Dict[str, str]]:
 
         endpoints = {}
         for key in ["LLM1", "LLM2", "Judge"]:
-            expander = st.expander(f"{key} Configuration", expanded=False)
-            with expander:
-                model_names = [model["name"] for model in models]
-                selected_model = st.selectbox(
-                    "Model", options=model_names, key=f"{key}_model"
-                )
-                if selected_model:
-                    model_details = next(
-                        (item
-                         for item in models if item["name"] == selected_model),
-                        None,
-                    )
-                    if model_details:
-                        providers = model_details["providers"]
-                        selected_provider = st.selectbox(
-                            "Provider",
-                            options=providers,
-                            key=f"{key}_provider"
-                        )
-                        endpoints[key] = f"{selected_model}@{selected_provider}"
+            with st.expander(get_summary_string(key), expanded=False):
+                endpoint = select_model_provider(key, models)
+                if endpoint:
+                    endpoints[key] = endpoint
 
         if st.button("Update Models from API"):
             update_models()
