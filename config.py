@@ -10,12 +10,7 @@ def input_fields():
     with st.sidebar:
         st.header("Configuration")
 
-        # Show text field if API key is not stored in secrets
-        if 'unify_api_key' in st.secrets:
-            api_key = st.secrets['unify_api_key']
-        else:
-            api_key = st.text_input("Unify API Key*", type="password", placeholder="Enter Unify API Key")
-
+        api_key = st.text_input("Unify API Key*", type="password", placeholder="Enter Unify API Key")
 
         model_names = [model['name'] for model in models]
         endpoints = {}
