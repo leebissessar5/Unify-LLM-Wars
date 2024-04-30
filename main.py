@@ -1,24 +1,33 @@
 import streamlit as st
 from unify import ChatBot
-from battle import llm_battle
+from battle import llm_battle, update_credits
 from config import input_fields
 
-for key in [
-    "LLM1",
-    "LLM2",
-    "Judge",
-    "New Chat",
-    "Done",
-    "Next Round",
-    "Valid Key",
-    "previous_api_key",
-]:
-    if key not in st.session_state:
-        st.session_state[key] = None
-        if key == "New Chat":
-            st.session_state[key] = True
-        if key == "Valid Key":
-            st.session_state[key] = False
+
+def init_session_state() -> None:
+    '''
+    Initialize the session state variables
+    '''
+    # Dictionary to define default values for session state keys
+    defaults = {
+        "LLM1": None,
+        "LLM2": None,
+        "Judge": None,
+        "New Chat": True,
+        "Done": None,
+        "Next Round": None,
+        "Valid Key": False,
+        "previous_api_key": None,
+        "new_chat_cb": new_chat_cb,
+        "next_round_cb": next_round_cb,
+        "prev_content": [],
+        "battle_results": {},
+        "round_number": 1,
+        "prompt": "",
+    }
+
+    for key, value in defaults.items():
+        st.session_state.setdefault(key, value)
 
 
 def new_chat_cb() -> None:
@@ -72,6 +81,7 @@ def main():
     '''
     Main function for the app
     '''
+    init_session_state()
     st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars &#x2694;")
 
@@ -86,21 +96,6 @@ def main():
             st.session_state[key] = None
         st.rerun()  # Rerun the app to revalidate the new API key
 
-    if "new_chat_cb" not in st.session_state:
-        st.session_state["new_chat_cb"] = new_chat_cb
-
-    if "next_round_cb" not in st.session_state:
-        st.session_state["next_round_cb"] = next_round_cb
-
-    if "prev_content" not in st.session_state:
-        st.session_state["prev_content"] = []
-
-    if "round_number" not in st.session_state:
-        st.session_state["round_number"] = 1
-
-    if "prompt" not in st.session_state:
-        st.session_state["prompt"] = ""
-
     # verify that all required fields are filled in
     if api_key and endpoints and all(endpoints.values()):
         # create ChatBot instances if they don't exist yet
@@ -114,7 +109,7 @@ def main():
                 st.session_state["New Chat"] = True
 
         try:
-            st.session_state["credits"] = st.session_state["LLM1"]._get_credits()
+            update_credits()
             st.session_state["Valid Key"] = True
         except Exception:
             st.session_state["Valid Key"] = False

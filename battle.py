@@ -1,26 +1,107 @@
 import streamlit as st
+from typing import Optional, Dict
 
 
 def update_credits() -> None:
-    '''
+    """
     Updates the credits in the session state
-    '''
+    """
     st.session_state["credits"] = st.session_state["LLM1"]._get_credits()
 
 
 def clear_chats(*chatbots) -> None:
-    '''
+    """
     Clears the chat history of all chatbots
 
     Args:
         *chatbots (Chatbot): The chatbots whose chat history should be cleared
-    '''
+    """
     for chatbot in chatbots:
         chatbot._message_history = []
 
 
+def create_chatbot_system_prompt(chatbot1: str, chatbot2: str) -> str:
+    """
+    Creates the system prompt for the battling chatbots
+
+    Args:
+        chatbot1 (Chatbot): The first chatbot
+        chatbot2 (Chatbot): The second chatbot
+
+    Returns:
+        str: The system prompt for the battle
+    """
+    system_prompt = f"""
+    You are {chatbot1} competing against {chatbot2} in a battle of wits and
+     knowledge. When it's your turn as the first player of the round, ask a
+     challenging technical question that would test your opponent's knowledge
+     and skills. The second player will answer the question and you will
+     evaluate the response before a judge selects the winner. The judge will
+     determine the winner based on the accuracy, relevance, and depth of
+     the response.
+    """
+    return system_prompt
+
+
+def init_chatbots(chatbot1: str, chatbot2: str, judge: str) -> None:
+    """
+    Sets the system prompt accordingly for the chatbots
+    """
+    judge_system_prompt = """You are the judge in an AI battle between two
+     chatbots: LLM 1 and LLM 2. Your role is to critically evaluate the
+     questions and answers provided, offering insightful commentary and
+     declaring a winner based on the criteria of accuracy, relevance, and
+     depth of response. After judging, state in the final line who is the
+     winner, *exactly* like this: **Winner: LLM 1**"""
+
+    chatbot1._update_message_history(
+        role="system", content=create_chatbot_system_prompt(chatbot1, chatbot2)
+    )
+    chatbot2._update_message_history(
+        role="system", content=create_chatbot_system_prompt(chatbot2, chatbot1)
+    )
+    judge._update_message_history(role="system", content=judge_system_prompt)
+
+
+def battle_prompt(
+        first_player: str,
+        second_player: str,
+) -> str:
+    """
+    Creates a battle prompt for the current round, including information
+    about the previous rounds' results.
+
+    Args:
+        first_player (str): The name of the first chatbot in the current round.
+        second_player (str): The name of the second chatbot in the current round.
+
+    Returns:
+        str: The battle prompt for the current round.
+    """
+    # Get the previous round results to provide context
+    battle_results = st.session_state.get("battle_results", {})
+
+    prompt = (
+        f"Round {st.session_state['round_number']}: {first_player}, "
+        "it's your turn to ask a question.\n"
+    )
+
+    # Add battle results if any rounds have been completed
+    if st.session_state["round_number"] > 1:
+        prompt += (
+            f"So far, you have {battle_results.get(f'{first_player} wins', 0)} wins, "
+            f"and {battle_results.get(f'{second_player} wins', 0)} wins for {second_player}. "
+            f"There have been {battle_results.get('ties', 0)} ties.\n"
+        )
+
+    # Append the challenge part to the prompt
+    prompt += "Challenge your opponent with a tough technical question."
+
+    return prompt
+
+
 def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
-    '''
+    """
     Simulates a battle between two chatbots
 
     Args:
@@ -31,20 +112,16 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         Defaults to True.
         next_round (bool, optional): Whether to start the next round.
         Defaults to True.
-    '''
+    """
     if new_chat:
         clear_chats(chatbot1, chatbot2, judge)
+        init_chatbots(chatbot1, chatbot2, judge)
         st.session_state["round_number"] = 1
-        st.session_state["prompt"] = (
-            "Generate a random question that you need to get answered, without giving an answer yourself."
-        )
         st.session_state["prev_content"] = []
+        st.session_state["battle_results"] = {}
     else:
         if next_round:
             st.session_state["round_number"] += 1
-        st.session_state["prompt"] = (
-            "Generate another random question that you need to get answered, without giving an answer yourself."
-        )
 
     for content in st.session_state["prev_content"]:
         st.markdown(content["Info"])
@@ -56,7 +133,10 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
             st.write(content["P1 Eval"])
         with st.chat_message("Judge"):
             st.write(content["Judge Eval"])
-        st.markdown(content["Result"])
+        if content['Result'] in ['LLM 1 wins!', 'LLM 2 wins!']:
+            st.success(content['Result'])
+        else:
+            st.info(content['Result'])
 
     if next_round:
         st.session_state["next_round_cb"](False)
@@ -74,10 +154,12 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         round_info = f"*Round {st.session_state['round_number']}*, First player's turn: {'LLM 1' if st.session_state['round_number'] % 2 == 1 else 'LLM 2'}"
         st.markdown(round_info)
 
+        prompt = battle_prompt(first_player, second_player)
+
         with st.chat_message(first_player[-1]):
             player1_question = st.write_stream(
                 chatbots[0]._process_input(
-                    st.session_state["prompt"], show_credits=False, show_provider=False
+                    prompt, show_credits=False, show_provider=False
                 )
             )
 
@@ -91,7 +173,7 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         with st.chat_message(first_player[-1]):
             player1_evaluation = st.write_stream(
                 chatbots[0]._process_input(
-                    f"Evaluating {second_player}'s answer: {player2_answer}",
+                    f"Evaluate {second_player}'s answer: {player2_answer}",
                     show_credits=False,
                     show_provider=False,
                 )
@@ -100,10 +182,9 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         with st.chat_message("Judge"):
             judge_evaluation = st.write_stream(
                 judge._process_input(
-                    f"""Judge the responses: {first_player}'s Question: {player1_question}\n
+                    f"""{first_player}'s Question: {player1_question}\n
                 {second_player}'s Answer: {player2_answer}\n
-                {first_player}'s Evaluation of {second_player}: {player1_evaluation}\n
-                After judging, state in the final line who is the winner, *exactly* like this: **Winner: LLM 1**""",
+                {first_player}'s Evaluation of {second_player}: {player1_evaluation}""",
                     show_credits=False,
                     show_provider=False,
                 )
@@ -124,12 +205,21 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         if "Winner: LLM 1" in judge_evaluation:
             st.success("LLM 1 wins!")
             st.session_state["prev_content"][-1]["Result"] = "LLM 1 wins!"
+            st.session_state["battle_results"][first_player + " wins"] = (
+                st.session_state["battle_results"].get(first_player + " wins", 0) + 1
+            )
         elif "Winner: LLM 2" in judge_evaluation:
             st.success("LLM 2 wins!")
             st.session_state["prev_content"][-1]["Result"] = "LLM 2 wins!"
+            st.session_state["battle_results"][second_player + " wins"] = (
+                st.session_state["battle_results"].get(second_player + " wins", 0) + 1
+            )
         else:
             st.info("It's a tie!")
             st.session_state["prev_content"][-1]["Result"] = "It's a tie!"
+            st.session_state["battle_results"]["ties"] = (
+                st.session_state["battle_results"].get("ties", 0) + 1
+            )
 
         update_credits()
 
@@ -142,4 +232,8 @@ def llm_battle(chatbot1, chatbot2, judge, new_chat=True, next_round=True):
         )
 
     with col2:
-        st.button("New Chat", key=f"new_chat", on_click=st.session_state["new_chat_cb"])
+        st.button(
+            "New Chat",
+            key="new_chat",
+            on_click=st.session_state["new_chat_cb"]
+        )
