@@ -144,7 +144,7 @@ def main():
                     )
                 else:
                     st.warning(
-                        "Please enter the Unify API Key on the sidebar to proceed."
+                        "Please enter the Unify API Key on the sidebar."
                     )
             else:
                 st.error("Invalid key. Please check your Unify API Key.")

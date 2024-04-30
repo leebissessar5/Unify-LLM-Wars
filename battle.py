@@ -25,8 +25,8 @@ def create_chatbot_system_prompt(chatbot1: str, chatbot2: str) -> str:
     Creates the system prompt for the battling chatbots
 
     Args:
-        chatbot1 (Chatbot): The first chatbot
-        chatbot2 (Chatbot): The second chatbot
+        chatbot1 (str): The first chatbot
+        chatbot2 (str): The second chatbot
 
     Returns:
         str: The system prompt for the battle
@@ -46,6 +46,11 @@ def create_chatbot_system_prompt(chatbot1: str, chatbot2: str) -> str:
 def init_chatbots(chatbot1: str, chatbot2: str, judge: str) -> None:
     """
     Sets the system prompt accordingly for the chatbots
+
+    Args:
+        chatbot1 (str): The first chatbot
+        chatbot2 (str): The second chatbot
+        judge (str): The judge
     """
     judge_system_prompt = """You are the judge in an AI battle between two
      chatbots: LLM 1 and LLM 2. Your role is to critically evaluate the
@@ -64,16 +69,16 @@ def init_chatbots(chatbot1: str, chatbot2: str, judge: str) -> None:
 
 
 def battle_prompt(
-        first_player: str,
-        second_player: str,
+    first_player: str,
+    second_player: str,
 ) -> str:
     """
     Creates a battle prompt for the current round, including information
     about the previous rounds' results.
 
     Args:
-        first_player (str): The name of the first chatbot in the current round.
-        second_player (str): The name of the second chatbot in the current round.
+        first_player (str): The first chatbot.
+        second_player (str): The second chatbot.
 
     Returns:
         str: The battle prompt for the current round.
@@ -89,20 +94,26 @@ def battle_prompt(
     # Add battle results if any rounds have been completed
     if st.session_state["round_number"] > 1:
         prompt += (
-            f"So far, you have {battle_results.get(f'{first_player} wins', 0)} wins, "
-            f"and {battle_results.get(f'{second_player} wins', 0)} wins for {second_player}. "
-            f"There have been {battle_results.get('ties', 0)} ties.\n"
+            f"""So far, you have {battle_results.get(
+                f'{first_player} wins',
+                0
+            )} wins, """
+            f"""and {battle_results.get(
+                f'{second_player} wins',
+                0
+            )} wins for {second_player}. """
+            f"There have been {battle_results.get('ties', 0)} ties."
         )
 
     return prompt
 
 
 def llm_battle(
-        chatbot1: ChatBot,
-        chatbot2: ChatBot,
-        judge: ChatBot,
-        new_chat: bool = True,
-        next_round: bool = True
+    chatbot1: ChatBot,
+    chatbot2: ChatBot,
+    judge: ChatBot,
+    new_chat: bool = True,
+    next_round: bool = True,
 ) -> None:
     """
     Simulates a battle between two chatbots
@@ -136,10 +147,10 @@ def llm_battle(
             st.write(content["P1 Eval"])
         with st.chat_message("Judge"):
             st.write(content["Judge Eval"])
-        if content['Result'] in ['LLM 1 wins!', 'LLM 2 wins!']:
-            st.success(content['Result'])
+        if content["Result"] in ["LLM 1 wins!", "LLM 2 wins!"]:
+            st.success(content["Result"])
         else:
-            st.info(content['Result'])
+            st.info(content["Result"])
         st.markdown(content["Summary"])
 
     if next_round:
@@ -155,7 +166,10 @@ def llm_battle(
             else ("LLM 2", "LLM 1")
         )
 
-        round_info = f"*Round {st.session_state['round_number']}*, First player's turn: {'LLM 1' if st.session_state['round_number'] % 2 == 1 else 'LLM 2'}"
+        round_info = f"""*Round {st.session_state['round_number']}*,
+        First player's turn: {
+            'LLM 1' if st.session_state['round_number'] % 2 == 1 else 'LLM 2'
+        }"""
         st.markdown(round_info)
 
         prompt = battle_prompt(first_player, second_player)
@@ -173,7 +187,7 @@ def llm_battle(
                     f"""{first_player}'s question to you, {second_player}:
                      {player1_question}""",
                     show_credits=False,
-                    show_provider=False
+                    show_provider=False,
                 )
             )
 
@@ -191,7 +205,8 @@ def llm_battle(
                 judge._process_input(
                     f"""{first_player}'s Question: {player1_question}\n
                 {second_player}'s Answer: {player2_answer}\n
-                {first_player}'s Evaluation of {second_player}: {player1_evaluation}""",
+                {first_player}'s Evaluation of {second_player}:
+                 {player1_evaluation}""",
                     show_credits=False,
                     show_provider=False,
                 )
@@ -213,15 +228,13 @@ def llm_battle(
             st.success("LLM 1 wins!")
             st.session_state["prev_content"][-1]["Result"] = "LLM 1 wins!"
             st.session_state["battle_results"]["LLM 1 wins"] = (
-                st.session_state["battle_results"].get("LLM 1 wins", 0)
-                + 1
+                st.session_state["battle_results"].get("LLM 1 wins", 0) + 1
             )
         elif "Winner: LLM 2" in judge_evaluation:
             st.success("LLM 2 wins!")
             st.session_state["prev_content"][-1]["Result"] = "LLM 2 wins!"
             st.session_state["battle_results"]["LLM 2 wins"] = (
-                st.session_state["battle_results"].get("LLM 2 wins", 0)
-                + 1
+                st.session_state["battle_results"].get("LLM 2 wins", 0) + 1
             )
         else:
             st.info("It's a tie!")
@@ -229,7 +242,9 @@ def llm_battle(
             st.session_state["battle_results"]["ties"] = (
                 st.session_state["battle_results"].get("ties", 0) + 1
             )
-        st.session_state["prev_content"][-1]["Summary"] = f"""Round {st.session_state['round_number']}:
+        st.session_state["prev_content"][-1][
+            "Summary"
+        ] = f"""Round {st.session_state['round_number']}:
          LLM 1 wins: {st.session_state['battle_results'].get('LLM 1 wins', 0)},
          LLM 2 wins: {st.session_state['battle_results'].get('LLM 2 wins', 0)},
          ties: {st.session_state['battle_results'].get('ties', 0)}"""
