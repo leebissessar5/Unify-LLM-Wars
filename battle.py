@@ -248,6 +248,7 @@ def llm_battle(
          LLM 1 wins: {st.session_state['battle_results'].get('LLM 1 wins', 0)},
          LLM 2 wins: {st.session_state['battle_results'].get('LLM 2 wins', 0)},
          ties: {st.session_state['battle_results'].get('ties', 0)}"""
+        st.markdown(st.session_state["prev_content"][-1]["Summary"])
 
         update_credits()
 
