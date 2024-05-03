@@ -32,7 +32,7 @@ https://github.com/leebissessar5/Unify-LLM-Wars/assets/120032434/0a6f60c0-e679-4
 
 ## Repository and Deployment
 ### Access the Source Code
-The source code for **LLM Wars** is part of a larger collection of demos. You can access the original source code for this specific project [here](https://github.com/leebissessar5/Unify-LLM-Wars). Navigate to the `LLM Wars` directory within the repository to find all necessary files.
+The source code for **LLM Wars** is part of a larger collection of demos. You can access the original source code for this specific project [here](https://github.com/leebissessar5/Unify-LLM-Wars).
 
 ### Live Application
 A live version of the application is hosted on Streamlit, allowing you to interact with it immediately without the need to set up a local environment. Visit the application at: [LLM Wars on Streamlit](https://unify-llm-wars-tftznesvztdt2bwsqgub3r.streamlit.app/).
