@@ -31,22 +31,25 @@ LLM Wars demonstrates novel LLM applications beyond common use cases by creating
 https://github.com/leebissessar5/Unify-LLM-Wars/assets/120032434/0a6f60c0-e679-4577-b409-9d5d6df11c9c
 
 ## Repository and Deployment
-The source repository for this project can be found [here](https://github.com/leebissessar5/Unify-LLM-Wars).
+### Access the Source Code
+The source code for **LLM Wars** is part of a larger collection of demos. You can access the original source code for this specific project [here](https://github.com/leebissessar5/Unify-LLM-Wars). Navigate to the `LLM Wars` directory within the repository to find all necessary files.
 
-To get started quickly, you can run the app hosted on [Streamlit](https://unify-llm-wars-tftznesvztdt2bwsqgub3r.streamlit.app/).
+### Live Application
+A live version of the application is hosted on Streamlit, allowing you to interact with it immediately without the need to set up a local environment. Visit the application at: [LLM Wars on Streamlit](https://unify-llm-wars-tftznesvztdt2bwsqgub3r.streamlit.app/).
 
-### Running the Application Locally
-Open a terminal located in this directory and first install all the dependencies with `pip install`:
+### Running Locally
+To run the application locally, follow these steps from within the `LLM Wars` directory in the cloned repository:
 
-```bash
-pip install -r requirements.txt
-```
+1. **Install Dependencies**: Ensure that all dependencies are installed using:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-And you're done! Simply launch the app with:
-```bash
-streamlit run main.py
-```
-
+2. **Launch the Application**: Start the application by executing:
+    ```bash
+    streamlit run main.py
+    ```
+This command initiates the Streamlit server, and you should see a URL displayed in your terminal where you can access the app locally, typically at `http://localhost:8501`.
 
 ## Contributors
 | Name | GitHub Profile |
