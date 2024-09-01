@@ -5,9 +5,9 @@ from config import input_fields
 
 
 def init_session_state() -> None:
-    '''
+    """
     Initialize the session state variables
-    '''
+    """
     # Dictionary to define default values for session state keys
     defaults = {
         "LLM1": None,
@@ -31,31 +31,31 @@ def init_session_state() -> None:
 
 
 def new_chat_cb() -> None:
-    '''
+    """
     Callback function for the "New Chat" button
-    '''
+    """
     st.session_state["New Chat"] = True
     st.session_state["Done"] = True
 
 
 def next_round_cb(yes: bool) -> None:
-    '''
+    """
     Callback function for the "Next Round" button
 
     Args:
         yes (bool): True if the user wants to start the next round,
         False otherwise
-    '''
+    """
     st.session_state["Next Round"] = yes
 
 
 def chatbots_exists() -> bool:
-    '''
+    """
     Returns True if all chatbots are not None
 
     Returns:
         bool: True if all chatbots are not None
-    '''
+    """
     return (
         st.session_state["LLM1"]
         and st.session_state["LLM2"]
@@ -64,12 +64,12 @@ def chatbots_exists() -> bool:
 
 
 def chatbots_empty() -> bool:
-    '''
+    """
     Returns True if all chatbots have no messages in their message history
 
     Returns:
         bool: True if all chatbots have no messages in their message history
-    '''
+    """
     return chatbots_exists() and (
         not st.session_state["LLM1"]._message_history
         or not st.session_state["LLM2"]._message_history
@@ -78,9 +78,9 @@ def chatbots_empty() -> bool:
 
 
 def main():
-    '''
+    """
     Main function for the app
-    '''
+    """
     init_session_state()
     st.set_page_config(page_title="LLM Wars")
     st.title("LLM Wars &#x2694;")
@@ -104,7 +104,9 @@ def main():
                 not st.session_state[keys]
                 or st.session_state[keys].endpoint != endpoints[keys]
             ):
-                st.session_state[keys] = ChatBot(api_key, endpoints[keys])
+                st.session_state[keys] = ChatBot(
+                    api_key=api_key, endpoint=endpoints[keys]
+                )
                 # Reset the chat if any of the ChatBots have been created
                 st.session_state["New Chat"] = True
 
@@ -121,7 +123,7 @@ def main():
         placeholder.write(
             """
             Usage:
-            1. Input your **Unify API Key**.  If you don’t have one yet,
+            1. Input your **Unify API Key**.  If you don't have one yet,
              log in to the [console](https://console.unify.ai/) to get yours.
             2. Choose your Endpoints (i.e. **Model and Provider**,
              in the [benchmark interface](https://unify.ai/hub)).
@@ -143,9 +145,9 @@ def main():
                         new_chat=True,
                     )
                 else:
-                    st.warning(
-                        "Please enter the Unify API Key on the sidebar."
-                    )
+                    st.warning("""
+                               Please enter the
+                               Unify API Key on the sidebar.""")
             else:
                 st.error("Invalid key. Please check your Unify API Key.")
     else:

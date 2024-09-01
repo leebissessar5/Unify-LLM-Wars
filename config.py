@@ -8,30 +8,28 @@ base_url = "https://api.unify.ai/v0"
 
 
 def init_session_state() -> None:
-    '''
+    """
     Initialize session state if it doesn't exist yet
-    '''
-    if 'selections' not in st.session_state:
-        st.session_state['selections'] = {
-            'LLM1': {}, 'LLM2': {}, 'Judge': {}
-        }
+    """
+    if "selections" not in st.session_state:
+        st.session_state["selections"] = {"LLM1": {}, "LLM2": {}, "Judge": {}}
 
 
 @st.cache_data
 def load_models() -> List[Dict[str, str]]:
-    '''
+    """
     Load models from models.json
 
     Returns:
         List[Dict[str, str]]: List of models
-    '''
+    """
     with open("models.json", "r") as f:
         data = json.load(f)
     return data["models"]
 
 
 def get_providers(model: str) -> List[str]:
-    '''
+    """
     Get providers for a given model
 
     Args:
@@ -39,12 +37,16 @@ def get_providers(model: str) -> List[str]:
 
     Returns:
         List[str]: List of providers
-    '''
-    url = f"{base_url}/endpoints_of"
-    response = requests.get(url, params={"model": model})
+    """
+    url = f"{base_url}/endpoints"
+
+    headers = {"Authorization": f'''Bearer {
+        st.session_state["previous_api_key"]}'''}
+
+    response = requests.get(url, params={"model": model}, headers=headers)
     if response.status_code == 200:
-        providers = [provider.split("@")[1]
-                     for provider in json.loads(response.text)]
+        providers = [provider.split("@")[1] for provider
+                     in json.loads(response.text)]
         return providers
     else:
         st.error("Failed to fetch providers from API.")
@@ -68,9 +70,9 @@ def get_summary_string(key: str) -> str:
 
 
 def update_models() -> None:
-    '''
+    """
     Update models.json with providers
-    '''
+    """
     model_names = list_models()
     models = []
 
@@ -99,14 +101,17 @@ def update_models() -> None:
 
 
 def list_models() -> List[str]:
-    '''
+    """
     List models from Unify API
 
     Returns:
         List[str]: List of models
-    '''
+    """
     url = f"{base_url}/models"
-    response = requests.get(url)
+    headers = {"Authorization": f'''
+               Bearer {st.session_state["previous_api_key"]
+                                          }'''}
+    response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return json.loads(response.text)
     else:
@@ -160,8 +165,7 @@ def input_fields() -> Tuple[str, Dict[str, str]]:
     with st.sidebar:
         st.header("Configuration")
         api_key = st.text_input(
-            "Unify API Key*",
-            type="password",
+            "Unify API Key*", type="password",
             placeholder="Enter Unify API Key"
         )
 
@@ -175,12 +179,11 @@ def input_fields() -> Tuple[str, Dict[str, str]]:
                     endpoints[key] = endpoint
 
         if st.session_state["Valid Key"] and st.sidebar.toggle(
-         "Show Credit Balance", value=False, key='show_credit'
+            "Show Credit Balance", value=False, key="show_credit"
         ):
             if "credits" in st.session_state:
-                st.sidebar.write(
-                    f"Credit Balance: ${st.session_state['credits']:.2f}"
-                )
+                st.sidebar.write(f"""Credit Balance: ${
+                    st.session_state['credits']:.2f}""")
 
         if st.button("Update Models from API"):
             update_models()
