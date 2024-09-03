@@ -261,5 +261,8 @@ def llm_battle(
         )
 
     with col2:
-        st.button("New Chat", key="new_chat",
-                  on_click=st.session_state["new_chat_cb"])
+        st.button(
+            "New Chat",
+            key="new_chat",
+            on_click=st.session_state["new_chat_cb"]
+        )
